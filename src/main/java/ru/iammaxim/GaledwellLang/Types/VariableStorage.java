@@ -1,7 +1,4 @@
-package ru.iammaxim.GaledwellLang;
-
-import ru.iammaxim.GaledwellLang.Types.Class;
-import ru.iammaxim.GaledwellLang.Types.Type;
+package ru.iammaxim.GaledwellLang.Types;
 
 import java.util.HashMap;
 import java.util.StringJoiner;

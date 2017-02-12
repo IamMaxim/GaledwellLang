@@ -1,6 +1,7 @@
 package ru.iammaxim.GaledwellLang;
 
 import ru.iammaxim.GaledwellLang.Functions.FunctionPrint;
+import ru.iammaxim.GaledwellLang.Types.VariableStorage;
 
 /**
  * Created by maxim on 2/12/17 at 1:33 AM.
