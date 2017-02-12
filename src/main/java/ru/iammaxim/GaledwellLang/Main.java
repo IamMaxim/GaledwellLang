@@ -1,5 +1,7 @@
 package ru.iammaxim.GaledwellLang;
 
+import ru.iammaxim.GaledwellLang.Parser.FunctionBuilder;
+import ru.iammaxim.GaledwellLang.Parser.Parser;
 import ru.iammaxim.GaledwellLang.Types.Function;
 
 import java.io.File;
@@ -15,7 +17,11 @@ public class Main {
         try (Scanner scanner = new Scanner(new File("src.txt")).useDelimiter("\\A")) {
             String src = scanner.next();
             Parser parser = new Parser();
-            ArrayList<Function> funcs = parser.parse(src);
+            parser.parse(src);
+
+            parser.tokens.forEach(System.out::println);
+
+            ArrayList<Function> funcs = new FunctionBuilder(parser.tokens).build();
 
             Runtime runtime = new Runtime();
             runtime.initStandartFunctions();

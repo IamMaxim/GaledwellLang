@@ -1,9 +1,9 @@
+//comment demostration
+
 main() {
-    func(1);
+    func("a string", 127, 0.0f);
 }
 
-func(arg) {
-    //comment
-    var1 = arg;
-    print(var1);
+func(s, i, f) {
+    print(s, i, f);
 }

@@ -16,6 +16,7 @@ public class FunctionPrint extends Function {
     public void call(Runtime runtime, Type[] args) {
         String[] newArgs = new String[args.length];
         for (int i = 0; i < args.length; i++) {
+            System.out.println("to print: " + args[i].toString(runtime));
             newArgs[i] = args[i].toString(runtime);
         }
         System.out.println(String.join(" ", newArgs));

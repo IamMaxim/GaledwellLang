@@ -1,15 +1,10 @@
 package ru.iammaxim.GaledwellLang;
 
-import ru.iammaxim.GaledwellLang.Functions.FunctionParsed;
-import ru.iammaxim.GaledwellLang.Types.Function;
-
-import java.util.ArrayList;
-
 /**
  * Created by maxim on 2/12/17 at 12:14 AM.
  */
-public class Parser {
-    public ArrayList<Function> parse(String src) {
+public class Parser_bak {
+/*    public ArrayList<Function> parse(String src) {
         return parseFunctions(src);
     }
 
@@ -92,5 +87,5 @@ public class Parser {
         }
 
         return functions;
-    }
+    }*/
 }
