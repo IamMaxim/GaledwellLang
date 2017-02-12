@@ -1,0 +1,9 @@
+main() {
+    func(1);
+}
+
+func(arg) {
+    //comment
+    var1 = arg;
+    print(var1);
+}
