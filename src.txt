@@ -1,4 +1,4 @@
-//comment demostration
+//comment demonstration
 
 main() {
     func("a string", 127, 0.0f);

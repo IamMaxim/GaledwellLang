@@ -59,7 +59,8 @@ public class FunctionBuilder {
                             if (level == 0)
                                 continue;
 
-                            args.add(t);
+                            if (t.type != TokenType.DELIMITER)
+                                args.add(t);
                         }
 
                         //function body
