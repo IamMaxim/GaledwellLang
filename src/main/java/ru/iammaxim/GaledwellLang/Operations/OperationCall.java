@@ -22,7 +22,7 @@ public class OperationCall extends Operation {
     }
 
     @Override
-    public String toString(Runtime runtime) {
+    public String toString(Runtime runtime, int indent) {
         return "call(): " + name;
     }
 }

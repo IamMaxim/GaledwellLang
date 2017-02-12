@@ -1,9 +1,16 @@
 //comment demonstration
 
 main() {
-    func("a string", 127, 0.0f);
+    testClass = class
+
+    testClass.string = "a string"
+    testClass.int = 127
+    testClass.innerClass = class
+    testClass.innerClass.float = 0.1f
+
+    func(testClass.string, testClass.int, testClass.innerClass.float)
 }
 
 func(s, i, f) {
-    print(s, i, f);
+    print(s, i, f)
 }

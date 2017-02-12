@@ -33,7 +33,11 @@ public class FunctionBuilder {
         return tokens.size() - index;
     }
 
-    public ArrayList<Function> build() {
+    public static ArrayList<Function> build(ArrayList<Token> tokens) {
+        return new FunctionBuilder(tokens)._build();
+    }
+
+    private ArrayList<Function> _build() {
         ArrayList<Function> functions = new ArrayList<>();
 
         while (left() > 0) {

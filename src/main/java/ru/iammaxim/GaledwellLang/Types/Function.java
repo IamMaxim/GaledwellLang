@@ -1,6 +1,7 @@
 package ru.iammaxim.GaledwellLang.Types;
 
 import ru.iammaxim.GaledwellLang.Runtime;
+import ru.iammaxim.GaledwellLang.Utils;
 
 import java.util.Arrays;
 
@@ -17,8 +18,12 @@ public abstract class Function extends Type {
     }
 
     @Override
-    public String toString(Runtime runtime) {
-        return "function(): " + name + " | " + Arrays.toString(args);
+    public String toString(Runtime runtime, int indent) {
+        return "\"function\":\n" +
+                Utils.indent(indent + 1) + "{\n" +
+                Utils.indent(indent + 2) + "\"name\": " + name + ",\n" +
+                Utils.indent(indent + 2) + "\"args\": " + Arrays.toString(args) + "\n" +
+                Utils.indent(indent + 1) + "}";
     }
 
     public abstract void call(Runtime runtime, Type... args);

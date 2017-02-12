@@ -21,7 +21,7 @@ public class OperationAssignGlobal extends Operation {
     }
 
     @Override
-    public String toString(Runtime runtime) {
-        return "assignGlobal: " + left + " <- " + right.toString(runtime);
+    public String toString(Runtime runtime, int indent) {
+        return "assignGlobal: " + left + " <- " + right.toString(runtime, indent + 4);
     }
 }

@@ -18,7 +18,7 @@ public class TypeString extends Type {
     }
 
     @Override
-    public String toString(Runtime runtime) {
+    public String toString(Runtime runtime, int indent) {
         return string;
     }
 }

@@ -19,16 +19,21 @@ public class Main {
             Parser parser = new Parser();
             parser.parse(src);
 
-//            parser.tokens.forEach(System.out::println);
-
-            ArrayList<Function> funcs = new FunctionBuilder(parser.tokens).build();
+            ArrayList<Function> funcs = FunctionBuilder.build(parser.tokens);
 
             Runtime runtime = new Runtime();
             runtime.initStandartFunctions();
+
             for (Function f : funcs) {
                 runtime.variableStorage.setVar(f.name, f);
             }
-            ((Function)runtime.variableStorage.getVar("main")).call(runtime);
+
+/*            long start = System.currentTimeMillis();
+            for (int i = 0; i < 100000000; i++)*/
+                ((Function)runtime.variableStorage.getVar("main")).call(runtime);
+//            System.out.println("elapsed time: " + (float)(System.currentTimeMillis() - start)/1000 + "sec");
+
+            System.out.println(runtime.variableStorage.toString(runtime, 0));
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

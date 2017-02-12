@@ -7,5 +7,5 @@ import ru.iammaxim.GaledwellLang.Runtime;
  */
 public abstract class Operation {
     public abstract void run(Runtime runtime);
-    public abstract String toString(Runtime runtime);
+    public abstract String toString(Runtime runtime, int indent);
 }

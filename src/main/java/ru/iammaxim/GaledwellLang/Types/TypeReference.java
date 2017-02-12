@@ -13,11 +13,11 @@ public class TypeReference extends Type {
     }
 
     @Override
-    public String toString(Runtime runtime) {
+    public String toString(Runtime runtime, int indent) {
         Type value = get(runtime);
         if (value == null)
             return name + " (null)";
-        return value.toString(runtime);
+        return value.toString(runtime, indent + 1);
     }
 
     public Type get(Runtime runtime) {

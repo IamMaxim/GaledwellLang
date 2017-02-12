@@ -25,7 +25,7 @@ public class OperationAssign extends Operation {
     }
 
     @Override
-    public String toString(Runtime runtime) {
-        return "assign: " + left + " <- " + right.toString(runtime);
+    public String toString(Runtime runtime, int indent) {
+        return "assign: " + left + " <- " + right.toString(runtime, indent + 4);
     }
 }

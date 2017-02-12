@@ -18,7 +18,7 @@ public class Parser {
             char c = chars[i];
 
             if (c == '/' && chars[i + 1] == '/') { // comment
-                i = src.indexOf('\n', i) + 1; // go to next line
+                i = src.indexOf('\n', i); // go to next line
                 continue;
             }
 
