@@ -19,7 +19,7 @@ public class Main {
             Parser parser = new Parser();
             parser.parse(src);
 
-            parser.tokens.forEach(System.out::println);
+//            parser.tokens.forEach(System.out::println);
 
             ArrayList<Function> funcs = new FunctionBuilder(parser.tokens).build();
 

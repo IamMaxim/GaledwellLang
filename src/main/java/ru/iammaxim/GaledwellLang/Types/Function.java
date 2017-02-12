@@ -14,8 +14,6 @@ public abstract class Function extends Type {
     public Function(String name, String... args) {
         this.name = name;
         this.args = args;
-
-        System.out.println(name + " | " + Arrays.toString(args));
     }
 
     @Override
