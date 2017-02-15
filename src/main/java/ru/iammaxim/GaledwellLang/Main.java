@@ -1,6 +1,7 @@
 package ru.iammaxim.GaledwellLang;
 
 import ru.iammaxim.GaledwellLang.Parser.FunctionBuilder;
+import ru.iammaxim.GaledwellLang.Parser.InvalidTokenException;
 import ru.iammaxim.GaledwellLang.Parser.Parser;
 import ru.iammaxim.GaledwellLang.Types.Function;
 
@@ -19,7 +20,9 @@ public class Main {
             Parser parser = new Parser();
             parser.parse(src);
 
-            ArrayList<Function> funcs = FunctionBuilder.build(parser.tokens);
+//            parser.tokens.forEach(System.out::println);
+
+            ArrayList<Function> funcs = new FunctionBuilder(parser.tokens).build();
 
             Runtime runtime = new Runtime();
             runtime.initStandartFunctions();
@@ -35,7 +38,7 @@ public class Main {
 
             System.out.println(runtime.variableStorage.toString(runtime, 0));
 
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | InvalidTokenException e) {
             e.printStackTrace();
         }
     }

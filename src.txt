@@ -1,16 +1,22 @@
 //comment demonstration
 
 main() {
-    testClass = class
+    i = j = k = 3 * (2 + 3);
 
-    testClass.string = "a string"
-    testClass.int = 127
-    testClass.innerClass = class
-    testClass.innerClass.float = 0.1f
+    testClass = class;
 
-    func(testClass.string, testClass.int, testClass.innerClass.float)
+    testClass.string = "a string";
+    testClass.int = 127;
+    testClass.innerClass = class;
+    testClass.innerClass.float = 0.1f;
+
+    func(testClass.string,
+     testClass.int,
+      testClass.innerClass.float);
+
+    func(123, 123.456f, "123456789");
 }
 
 func(s, i, f) {
-    print(s, i, f)
+    print(s, i, f);
 }

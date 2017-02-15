@@ -1,12 +1,6 @@
 package ru.iammaxim.GaledwellLang.Parser;
 
-import ru.iammaxim.GaledwellLang.Functions.FunctionParsed;
-import ru.iammaxim.GaledwellLang.Operations.Operation;
-import ru.iammaxim.GaledwellLang.Operations.OperationAssign;
-import ru.iammaxim.GaledwellLang.Operations.OperationAssignGlobal;
-import ru.iammaxim.GaledwellLang.Operations.OperationCall;
 import ru.iammaxim.GaledwellLang.Types.Function;
-import ru.iammaxim.GaledwellLang.Types.Type;
 
 import java.util.ArrayList;
 
@@ -14,162 +8,161 @@ import java.util.ArrayList;
  * Created by maxim on 2/12/17 at 3:03 PM.
  */
 public class FunctionBuilder {
-    public ArrayList<Token> tokens;
-    private int index = 0;
-    private Token t; // current token
+    private Tokener tokener;
+    private Token t;
 
     public FunctionBuilder(ArrayList<Token> tokens) {
-        this.tokens = tokens;
+        tokener = new Tokener(tokens);
     }
 
     private Token eat() {
-        if (index >= tokens.size())
-            return null;
-        Token t = tokens.get(index++);
-        return t;
+        return tokener.eat();
     }
 
-    private int left() {
-        return tokens.size() - index;
-    }
-
-    public static ArrayList<Function> build(ArrayList<Token> tokens) {
-        return new FunctionBuilder(tokens)._build();
-    }
-
-    private ArrayList<Function> _build() {
+    public ArrayList<Function> build() throws InvalidTokenException {
         ArrayList<Function> functions = new ArrayList<>();
 
-        while (left() > 0) {
-            t = eat();
-            //check if this is function
-            if (t.type == TokenType.IDENTIFIER) {
-                if (left() >= 4) { // (){}
-                    String name = t.token;
-                    ArrayList<Token> args = new ArrayList<>();
-                    ArrayList<Token> body = new ArrayList<>();
+        while (tokener.left() > 0) {
+            Token functionName;
 
-                    //functions args
-                    if ((t = eat()).token.equals("(")) {
-                        int level = 1; //already ate '('
-                        while (level > 0) {
-                            t = eat();
+            //read function name
+            if ((functionName = eat()).type != TokenType.IDENTIFIER)
+                throw new InvalidTokenException("Excepted identifier");
 
-                            if (t.token.equals("("))
-                                level++;
-                            else if (t.token.equals(")"))
-                                level--;
+            //read function args
+            if (!eat().equals(new Token("(")))
+                throw new InvalidTokenException("Excepted (");
+            Tokener args = tokener.readTo(new Token(")"));
 
-                            if (level == 0)
-                                continue;
+            //read function body
+            if (!eat().equals(new Token("{")))
+                throw new InvalidTokenException("Excepted {");
+            Tokener body = tokener.readTo(new Token("}"));
 
-                            if (t.type != TokenType.DELIMITER)
-                                args.add(t);
-                        }
+            //process body
+            ArrayList<Tokener> bodyParts = body.split(new Token(";"));
+            for (Tokener statement : bodyParts) {
+                //skip empty statements
+                if (statement.isEmpty())
+                    continue;
+                StatementTree tree = parseExpression(statement);
 
-                        //function body
-                        if ((t = eat()).token.equals("{")) {
-                            level = 1; //already ate '{'
-                            while (true) {
-                                t = eat();
-
-                                if (t.token.equals("{"))
-                                    level++;
-                                else if (t.token.equals("}"))
-                                    level--;
-
-                                if (level == 0)
-                                    break;
-
-                                //TODO: use delimiter to detect statements
-                                if (t.type != TokenType.DELIMITER) {
-                                    body.add(t);
-                                }
-                            }
-                        }
-                        functions.add(new FunctionBuilder_inner().buildFunction(name, args, body));
-                    }
-                }
+                System.out.println("tree: " + tree);
             }
         }
 
         return functions;
     }
 
-    private String[] tokensToStringArray(ArrayList<Token> tokens) {
-        String[] strs = new String[tokens.size()];
-        for (int i = 0; i < tokens.size(); i++)
-            strs[i] = tokens.get(i).token;
-        return strs;
-    }
+    private StatementTree parseExpression(Tokener tokener) throws InvalidTokenException {
+        tokener.trimParentheses();
 
-    private class FunctionBuilder_inner {
-        private ArrayList<Token> tokens;
-        private int index = 0;
-        private Token t; // current token
-
-        private Token eat() {
-            if (index >= tokens.size())
-                return null;
-            Token t = tokens.get(index++);
-            return t;
-        }
-
-        private int left() {
-            return tokens.size() - index;
-        }
-
-        private Function buildFunction(String name, ArrayList<Token> args, ArrayList<Token> body) {
-            ArrayList<Operation> operations = new ArrayList<>();
-            tokens = body;
-
-            while (left() > 0) {
-                t = eat();
-
-                // global-space assignation (stored in variableStorage.globalVariables)
-                if (t.token.equals("global")) {
-                    if (left() >= 3) { // left, =, right
-                        t = eat();
-                        if (t.type == TokenType.IDENTIFIER) {
-                            index++; // skip '='
-                            operations.add(new OperationAssignGlobal(t.token, Type.get((t = eat()).token)));
+        int level = 0;
+        Token t, highest = null;
+        int highestPriorityIndex = -1;
+        for (int i = 0; tokener.left() > 0; i++) {
+            t = tokener.eat();
+            if (t.token.equals("("))
+                level++;
+            else if (t.token.equals(")")) {
+                level--;
+            }
+            if (level == 0) {
+                if (t.type == TokenType.OPERATOR) {
+                    if (highest == null) {
+                        highest = t;
+                        highestPriorityIndex = i;
+                    } else {
+                        if (isOrderHigher(t, highest)) {
+                            highest = t;
+                            highestPriorityIndex = i;
                         }
                     }
-                    continue;
-                }
-
-                //assignation
-                if (left() >= 3 && tokens.get(index).token.equals("=")) {
-                    index++; // skip '='
-                    operations.add(new OperationAssign(t.token, Type.get((t = eat()).token)));
-                }
-
-                // TODO: use delimiter to detect arguments and their count
-                if (left() >= 3 && tokens.get(index).token.equals("(")) {
-                    index++;
-                    int level = 1;
-                    String name1 = t.token;
-                    ArrayList<Type> args1 = new ArrayList<>();
-                    while (true) {
-                        t = eat();
-
-                        if (t.token.equals("("))
-                            level++;
-                        if (t.token.equals(")"))
-                            level--;
-
-                        if (level == 0)
-                            break;
-
-                        args1.add(Type.get(t.token));
-                    }
-
-                    operations.add(new OperationCall(name1, args1.toArray(new Type[0])));
                 }
             }
+        }
+
+        if (highest == null)
+            return new StatementTree(tokener.tokens.get(0));
+
+        return new StatementTree(highest,
+                parseExpression(tokener.subtokener(0, highestPriorityIndex)),
+                parseExpression(tokener.subtokener(highestPriorityIndex + 1, tokener.size())));
+    }
 
 
-            return new FunctionParsed(name, tokensToStringArray(args), operations);
+    /**
+     * @param first  first token
+     * @param second second token
+     * @return true if second's order is higher than first's
+     * @throws InvalidTokenException
+     */
+    private boolean isOrderHigher(Token first, Token second) throws InvalidTokenException {
+        return getOrder(first) < getOrder(second);
+    }
+
+
+    /**
+     * @param t token to check
+     * @return operator's order
+     * @throws InvalidTokenException if operator unknown
+     */
+    private int getOrder(Token t) throws InvalidTokenException {
+        int level = 0;
+        if (t.token.equals("*") || t.token.equals("/"))
+            level = 5;
+        else if (t.token.equals("+") || t.token.equals("-"))
+            level = 4;
+        else if (t.token.equals("++") || t.token.equals("--"))
+            level = 3;
+        else if (t.token.equals("=="))
+            level = 2;
+        else if (t.token.equals("="))
+            level = 1;
+        else throw new InvalidTokenException("Excepted operator, but got " + t.token);
+
+        return level;
+    }
+
+    private class StatementTree {
+        public Token operator;
+        public StatementTree left, right;
+
+
+        public StatementTree(Token operator, StatementTree left, StatementTree right) {
+            this.operator = operator;
+            this.left = left;
+            this.right = right;
+        }
+
+        public StatementTree(Token operator) {
+            this.operator = operator;
+        }
+
+        @Override
+        public String toString() {
+            if (operator == null)
+                return "null";
+
+            StringBuilder sb = new StringBuilder();
+            if (left != null)
+                sb.append("(").append(left).append(")");
+            sb.append(operator.token);
+            if (right != null)
+                sb.append("(").append(right).append(")");
+            return sb.toString();
         }
     }
+
+/*    private class StatementFunctionCall extends StatementTree {
+        public String functionName;
+        public ArrayList<String> args;
+
+        public StatementFunctionCall(Token operator) {
+            super(null);
+            this.functionName =
+        }
+
+
+    }*/
 }

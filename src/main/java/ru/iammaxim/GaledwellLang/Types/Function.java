@@ -19,10 +19,12 @@ public abstract class Function extends Type {
 
     @Override
     public String toString(Runtime runtime, int indent) {
-        return "\"function\":\n" +
-                Utils.indent(indent + 1) + "{\n" +
-                Utils.indent(indent + 2) + "\"name\": " + name + ",\n" +
-                Utils.indent(indent + 2) + "\"args\": " + Arrays.toString(args) + "\n" +
+        return "{\n" +
+                Utils.indent(indent + 1) + "\"function\":\n" +
+                Utils.indent(indent + 2) + "{\n" +
+                Utils.indent(indent + 3) + "\"name\": " + name + ",\n" +
+                Utils.indent(indent + 3) + "\"args\": " + Arrays.toString(args) + "\n" +
+                Utils.indent(indent + 2) + "}\n" +
                 Utils.indent(indent + 1) + "}";
     }
 

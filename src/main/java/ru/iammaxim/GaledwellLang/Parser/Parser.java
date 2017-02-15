@@ -12,7 +12,7 @@ public class Parser {
     public Parser() {
     }
 
-    public void parse(String src) {
+    public void parse(String src) throws InvalidTokenException {
         char[] chars = src.toCharArray();
         for (int i = 0; i < src.length(); i++) {
             char c = chars[i];
@@ -37,29 +37,38 @@ public class Parser {
                 continue;
             }
 
-            // check if this is scope
-            if (c == '(' || c == ')' || c == '{' || c == '}') {
+            String s;
+
+            //check if this is operator
+            //check double-character operators (==, ++, --)
+            if (src.length() - i > 1) {
+                s = new String(new char[]{c, chars[i + 1]});
+                if (Token.is(TokenType.OPERATOR, s)) {
+                    cutOffToken();
+                    tokens.add(new Token(s));
+                    i++; // skip next '='
+                    continue;
+                }
+            }
+            //check single-character operators (+, -, *, /, *)
+            s = String.valueOf(c);
+            if (Token.is(TokenType.OPERATOR, s)) {
                 cutOffToken();
-                tokens.add(new Token(TokenType.SCOPE, String.valueOf(c)));
+                tokens.add(new Token(s));
                 continue;
             }
 
-            //check if this is operator
-            if (c == '=' && chars[i + 1] == '=') {
+            // check if this is scope
+            if (Token.is(TokenType.SCOPE, s)) {
                 cutOffToken();
-                tokens.add(new Token(TokenType.OPERATOR, "=="));
-                i++; // skip next '='
-                continue;
-            } else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '=') {
-                cutOffToken();
-                tokens.add(new Token(TokenType.OPERATOR, String.valueOf(c)));
+                tokens.add(new Token(s));
                 continue;
             }
 
             //check if this is delimiter
-            if (c == ';' || c == ',') {
+            if (Token.is(TokenType.DELIMITER, s)) {
                 cutOffToken();
-                tokens.add(new Token(TokenType.DELIMITER, String.valueOf(c)));
+                tokens.add(new Token(s));
                 continue;
             }
 
