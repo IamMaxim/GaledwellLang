@@ -62,9 +62,21 @@ public class FunctionBuilder {
         int highestPriorityIndex = -1;
         for (int i = 0; tokener.left() > 0; i++) {
             t = tokener.eat();
-            if (t.token.equals("("))
+            if (t.token.equals("(")) {
+                //check if this is function call
+                if (i > 0 && tokener.tokens.get(i - 1).type == TokenType.IDENTIFIER)
+                    try {
+                        int index = tokener.index;
+                        Tokener argsTokener = tokener.readTo(new Token(")"));
+                        ArrayList<Tokener> args = argsTokener.split(new Token(","));
+                        tokener.index = index;
+                        return new StatementFunctionCall(tokener.tokens.get(i - 1), args);
+                    } catch (InvalidTokenException e) {
+                        e.printStackTrace();
+                    }
+
                 level++;
-            else if (t.token.equals(")")) {
+            } else if (t.token.equals(")")) {
                 level--;
             }
             if (level == 0) {
@@ -154,15 +166,31 @@ public class FunctionBuilder {
         }
     }
 
-/*    private class StatementFunctionCall extends StatementTree {
+    private class StatementFunctionCall extends StatementTree {
         public String functionName;
-        public ArrayList<String> args;
+        public ArrayList<StatementTree> args;
 
-        public StatementFunctionCall(Token operator) {
+        public StatementFunctionCall(Token functionName, ArrayList<Tokener> args) throws InvalidTokenException {
             super(null);
-            this.functionName =
+            this.functionName = functionName.token;
+            this.args = new ArrayList<>(args.size());
+            for (Tokener arg : args) {
+                this.args.add(parseExpression(arg));
+            }
         }
 
-
-    }*/
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(functionName);
+            sb.append("(");
+            for (int i = 0; i < args.size(); i++) {
+                sb.append(args.get(i));
+                if (i < args.size() - 1)
+                    sb.append(", ");
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+    }
 }
