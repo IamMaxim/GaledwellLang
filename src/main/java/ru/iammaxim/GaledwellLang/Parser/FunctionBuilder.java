@@ -73,7 +73,7 @@ public class FunctionBuilder {
                         highest = t;
                         highestPriorityIndex = i;
                     } else {
-                        if (isOrderHigher(t, highest)) {
+                        if (isOrderHigher(highest, t)) {
                             highest = t;
                             highestPriorityIndex = i;
                         }
@@ -110,15 +110,15 @@ public class FunctionBuilder {
     private int getOrder(Token t) throws InvalidTokenException {
         int level = 0;
         if (t.token.equals("*") || t.token.equals("/"))
-            level = 5;
+            level = 1;
         else if (t.token.equals("+") || t.token.equals("-"))
-            level = 4;
+            level = 2;
         else if (t.token.equals("++") || t.token.equals("--"))
             level = 3;
         else if (t.token.equals("=="))
-            level = 2;
+            level = 4;
         else if (t.token.equals("="))
-            level = 1;
+            level = 5;
         else throw new InvalidTokenException("Excepted operator, but got " + t.token);
 
         return level;
