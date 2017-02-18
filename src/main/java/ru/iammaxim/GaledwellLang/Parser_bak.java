@@ -4,11 +4,11 @@ package ru.iammaxim.GaledwellLang;
  * Created by maxim on 2/12/17 at 12:14 AM.
  */
 public class Parser_bak {
-/*    public ArrayList<Function> parse(String src) {
+/*    public ArrayList<ValueFunction> parse(String src) {
         return parseFunctions(src);
     }
 
-    public ArrayList<Function> parseFunctions(String src) {
+    public ArrayList<ValueFunction> parseFunctions(String src) {
         ArrayList<Character> newSrc = new ArrayList<>(src.length());
         for (int i = 0; i < src.length(); i++) {
             newSrc.add(src.charAt(i));
@@ -77,7 +77,7 @@ public class Parser_bak {
             tokens.add(s);
         }
 
-        ArrayList<Function> functions = new ArrayList<>();
+        ArrayList<ValueFunction> functions = new ArrayList<>();
         for (int i = 0; i < tokens.size(); i += 2) {
             String name_and_args = tokens.get(i);
             int divisionIndex = name_and_args.indexOf("(");

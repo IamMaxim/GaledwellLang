@@ -19,4 +19,5 @@ main() {
 
 func(s, i, f) {
     print(s, i, f);
+    return 1;
 }

@@ -1,17 +1,18 @@
 package ru.iammaxim.GaledwellLang.Parser;
 
-import ru.iammaxim.GaledwellLang.Types.Function;
+import ru.iammaxim.GaledwellLang.Parser.Expression.*;
+import ru.iammaxim.GaledwellLang.Values.Value;
 
 import java.util.ArrayList;
 
 /**
  * Created by maxim on 2/12/17 at 3:03 PM.
  */
-public class FunctionBuilder {
+public class FunctionParser {
     private Tokener tokener;
     private Token t;
 
-    public FunctionBuilder(ArrayList<Token> tokens) {
+    public FunctionParser(ArrayList<Token> tokens) {
         tokener = new Tokener(tokens);
     }
 
@@ -19,24 +20,35 @@ public class FunctionBuilder {
         return tokener.eat();
     }
 
-    public ArrayList<Function> build() throws InvalidTokenException {
-        ArrayList<Function> functions = new ArrayList<>();
+    public ArrayList<ParsedFunction> build() throws InvalidTokenException {
+        ArrayList<ParsedFunction> functions = new ArrayList<>();
 
         while (tokener.left() > 0) {
             Token functionName;
+            String[] args;
+            ArrayList<Expression> exps = new ArrayList<>();
 
             //read function name
             if ((functionName = eat()).type != TokenType.IDENTIFIER)
-                throw new InvalidTokenException("Excepted identifier");
+                throw new InvalidTokenException("Excepted identifier while parsing function name");
 
             //read function args
             if (!eat().equals(new Token("(")))
                 throw new InvalidTokenException("Excepted (");
-            Tokener args = tokener.readTo(new Token(")"));
+            Tokener argsTokener = tokener.readTo(new Token(")"));
+            ArrayList<Tokener> argsTokeners = argsTokener.split(new Token(","));
+            args = new String[argsTokeners.size()];
+            for (int i = 0; i < argsTokeners.size(); i++) {
+                Tokener argTokener1 = argsTokeners.get(i);
+                if (argTokener1.size() > 1)
+                    throw new InvalidTokenException("Excepted 1 identifier, got " + argTokener1.size() + " while parsing argument");
+                if (argTokener1.size() > 0)
+                    args[i] = argTokener1.tokens.get(0).token;
+            }
 
             //read function body
             if (!eat().equals(new Token("{")))
-                throw new InvalidTokenException("Excepted {");
+                throw new InvalidTokenException("Excepted { while parsing function body");
             Tokener body = tokener.readTo(new Token("}"));
 
             //process body
@@ -45,17 +57,35 @@ public class FunctionBuilder {
                 //skip empty statements
                 if (statement.isEmpty())
                     continue;
-                StatementTree tree = parseExpression(statement);
+                Expression exp = parseExpression(statement);
+                exps.add(exp);
 
-                System.out.println("tree: " + tree);
+//                System.out.println("tree: " + exp);
             }
+
+            //build function
+            functions.add(new ParsedFunction(functionName.token, args, exps));
         }
 
         return functions;
     }
 
-    private StatementTree parseExpression(Tokener tokener) throws InvalidTokenException {
+    public static Expression parseExpression(Tokener tokener) throws InvalidTokenException {
         tokener.trimParentheses();
+
+        //check if this is value
+        if (tokener.size() == 1) {
+            Value val = Value.get(tokener.tokens.get(0).token);
+            if (val != null)
+                return new ExpressionValue(val);
+        }
+
+        //check if this is return
+        if (tokener.size() >= 2) {
+            if (tokener.tokens.get(0).token.equals("return")) {
+                return new ExpressionReturn(parseExpression(tokener.subtokener(1, tokener.size())));
+            }
+        }
 
         int level = 0;
         Token t, highest = null;
@@ -70,7 +100,7 @@ public class FunctionBuilder {
                         Tokener argsTokener = tokener.readTo(new Token(")"));
                         ArrayList<Tokener> args = argsTokener.split(new Token(","));
                         tokener.index = index;
-                        return new StatementFunctionCall(tokener.tokens.get(i - 1), args);
+                        return new ExpressionFunctionCall(tokener.tokens.get(i - 1), args);
                     } catch (InvalidTokenException e) {
                         e.printStackTrace();
                     }
@@ -95,9 +125,9 @@ public class FunctionBuilder {
         }
 
         if (highest == null)
-            return new StatementTree(tokener.tokens.get(0));
+            return new ExpressionTree(tokener.tokens.get(0));
 
-        return new StatementTree(highest,
+        return new ExpressionTree(highest,
                 parseExpression(tokener.subtokener(0, highestPriorityIndex)),
                 parseExpression(tokener.subtokener(highestPriorityIndex + 1, tokener.size())));
     }
@@ -107,9 +137,9 @@ public class FunctionBuilder {
      * @param first  first token
      * @param second second token
      * @return true if second's order is higher than first's
-     * @throws InvalidTokenException
+     * @throws InvalidTokenException if one of operators unknown
      */
-    private boolean isOrderHigher(Token first, Token second) throws InvalidTokenException {
+    private static boolean isOrderHigher(Token first, Token second) throws InvalidTokenException {
         return getOrder(first) < getOrder(second);
     }
 
@@ -119,7 +149,7 @@ public class FunctionBuilder {
      * @return operator's order
      * @throws InvalidTokenException if operator unknown
      */
-    private int getOrder(Token t) throws InvalidTokenException {
+    private static int getOrder(Token t) throws InvalidTokenException {
         int level = 0;
         if (t.token.equals("*") || t.token.equals("/"))
             level = 1;
@@ -134,63 +164,5 @@ public class FunctionBuilder {
         else throw new InvalidTokenException("Excepted operator, but got " + t.token);
 
         return level;
-    }
-
-    private class StatementTree {
-        public Token operator;
-        public StatementTree left, right;
-
-
-        public StatementTree(Token operator, StatementTree left, StatementTree right) {
-            this.operator = operator;
-            this.left = left;
-            this.right = right;
-        }
-
-        public StatementTree(Token operator) {
-            this.operator = operator;
-        }
-
-        @Override
-        public String toString() {
-            if (operator == null)
-                return "null";
-
-            StringBuilder sb = new StringBuilder();
-            if (left != null)
-                sb.append("(").append(left).append(")");
-            sb.append(operator.token);
-            if (right != null)
-                sb.append("(").append(right).append(")");
-            return sb.toString();
-        }
-    }
-
-    private class StatementFunctionCall extends StatementTree {
-        public String functionName;
-        public ArrayList<StatementTree> args;
-
-        public StatementFunctionCall(Token functionName, ArrayList<Tokener> args) throws InvalidTokenException {
-            super(null);
-            this.functionName = functionName.token;
-            this.args = new ArrayList<>(args.size());
-            for (Tokener arg : args) {
-                this.args.add(parseExpression(arg));
-            }
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(functionName);
-            sb.append("(");
-            for (int i = 0; i < args.size(); i++) {
-                sb.append(args.get(i));
-                if (i < args.size() - 1)
-                    sb.append(", ");
-            }
-            sb.append(")");
-            return sb.toString();
-        }
     }
 }

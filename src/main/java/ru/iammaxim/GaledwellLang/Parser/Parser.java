@@ -7,12 +7,20 @@ import java.util.ArrayList;
  */
 public class Parser {
     private Token ct = new Token(); //current token
-    public ArrayList<Token> tokens = new ArrayList<>();
+    private ArrayList<Token> tokens = new ArrayList<>();
+    private String src;
 
-    public Parser() {
+    private Parser(String src) {
+        this.src = src;
     }
 
-    public void parse(String src) throws InvalidTokenException {
+    public static ArrayList<Token> parse(String src) throws InvalidTokenException {
+        Parser parser = new Parser(src);
+        parser._parse();
+        return parser.tokens;
+    }
+
+    private void _parse() throws InvalidTokenException {
         char[] chars = src.toCharArray();
         for (int i = 0; i < src.length(); i++) {
             char c = chars[i];
@@ -22,7 +30,7 @@ public class Parser {
                 continue;
             }
 
-            //parse string
+            //parse value
             if (c == '"') {
                 ct.token += c;
                 while ((c = chars[++i]) != '"') {
