@@ -21,23 +21,23 @@ public class OperationCall extends Operation {
         //cleanup return value
         runtime.returnValueTmp = null;
 
-        String name = ((ValueReference) runtime.stack.pop()).name;
+        int id = ((ValueReference) runtime.stack.pop()).id;
         ValueObject parent = (ValueObject) runtime.stack.pop();
 
         Value[] newArgs = new Value[argsCount];
         for (int i = 0; i < newArgs.length; i++) {
             Value arg = runtime.stack.pop();
             if (arg instanceof ValueReference) {
-                String argName = ((ValueReference) arg).name;
+                int argID = ((ValueReference) arg).id;
                 ValueObject argParent = (ValueObject) runtime.stack.pop();
-                newArgs[i] = argParent.getField(argName);
+                newArgs[i] = argParent.getField(argID);
             } else {
                 newArgs[i] = arg;
             }
         }
 
         int currentPosBackup = runtime.currentCursorPos;
-        ((ValueFunction)parent.getField(name)).call(runtime, newArgs);
+        ((ValueFunction)parent.getField(id)).call(runtime, newArgs);
         runtime.currentCursorPos = currentPosBackup;
         return null;
     }

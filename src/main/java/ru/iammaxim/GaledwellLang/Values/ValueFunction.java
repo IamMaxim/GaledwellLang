@@ -10,11 +10,11 @@ import java.util.Arrays;
  * Created by maxim on 2/12/17 at 1:16 AM.
  */
 public abstract class ValueFunction extends Value {
-    public String name;
-    public String[] args;
+    public int id;
+    public int[] args;
 
-    public ValueFunction(String name, String... args) {
-        this.name = name;
+    public ValueFunction(int id, int... args) {
+        this.id = id;
         this.args = args;
     }
 
@@ -23,7 +23,7 @@ public abstract class ValueFunction extends Value {
         return "{\n" +
                 Utils.indent(indent + 1) + "\"function\":\n" +
                 Utils.indent(indent + 2) + "{\n" +
-                Utils.indent(indent + 3) + "\"name\": " + name + ",\n" +
+                Utils.indent(indent + 3) + "\"path\": " + id + ",\n" +
                 Utils.indent(indent + 3) + "\"args\": " + Arrays.toString(args) + "\n" +
                 Utils.indent(indent + 2) + "}\n" +
                 Utils.indent(indent + 1) + "}";

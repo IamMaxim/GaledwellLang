@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class FunctionParsed extends ValueFunction {
     public ArrayList<Operation> operations;
 
-    public FunctionParsed(String name, String[] args, ArrayList<Operation> operations) {
-        super(name, args);
+    public FunctionParsed(int id, int[] args, ArrayList<Operation> operations) {
+        super(id, args);
         this.operations = operations;
     }
 

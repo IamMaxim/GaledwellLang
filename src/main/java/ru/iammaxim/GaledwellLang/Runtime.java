@@ -22,7 +22,7 @@ public class Runtime {
             vr2 = null;
 
     public void initStandartFunctions() {
-        variableStorage.setField("print", new FunctionPrint());
+        variableStorage.setField("print".hashCode(), new FunctionPrint());
     }
 
     public void goToFunctionEnd() {

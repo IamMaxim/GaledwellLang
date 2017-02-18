@@ -1,6 +1,6 @@
 package ru.iammaxim.GaledwellLang.Compiler;
 
-import ru.iammaxim.GaledwellLang.Main;
+import ru.iammaxim.GaledwellLang.GaledwellLang;
 import ru.iammaxim.GaledwellLang.Operations.*;
 import ru.iammaxim.GaledwellLang.Parser.Expression.*;
 import ru.iammaxim.GaledwellLang.Parser.TokenType;
@@ -35,11 +35,11 @@ public class Compiler {
 
     private void compileExpression(Expression exp, int depth) {
         try {
-            Main.fos3.write(("compiling: " + exp.toString() + "\n").getBytes());
+            GaledwellLang.fos3.write(("compiling: " + exp.toString() + "\n").getBytes());
 
             //check if this is function call
             if (exp instanceof ExpressionFunctionCall) {
-                Main.fos3.write(("compiling: function call\n").getBytes());
+                GaledwellLang.fos3.write(("compiling: function call\n").getBytes());
 
                 ExpressionFunctionCall call = (ExpressionFunctionCall) exp;
 
@@ -53,20 +53,20 @@ public class Compiler {
                 if (depth == 0)
                     operations.add(new OperationPop()); //pop return value of function if it won't be used
             } else if (exp instanceof ExpressionReturn) {
-                Main.fos3.write(("compiling: return\n").getBytes());
+                GaledwellLang.fos3.write(("compiling: return\n").getBytes());
 
                 compileExpression(((ExpressionReturn) exp).returnExp, depth + 1);
                 operations.add(new OperationReturn());
             } else if (exp instanceof ExpressionValue) {
-                Main.fos3.write(("compiling: value\n").getBytes());
+                GaledwellLang.fos3.write(("compiling: value\n").getBytes());
 
                 ExpressionValue val = (ExpressionValue) exp;
                 if (val.value instanceof ValueReference) {
-                    compilePathToVar(((ValueReference) val.value).name);
+                    compilePathToVar(((ValueReference) val.value).path);
                 } else
                     operations.add(new OperationPush(val.value));
             } else if (exp instanceof ExpressionTree) {
-                Main.fos3.write(("compiling: tree\n").getBytes());
+                GaledwellLang.fos3.write(("compiling: tree\n").getBytes());
 
                 ExpressionTree tree = ((ExpressionTree) exp);
 
@@ -108,9 +108,9 @@ public class Compiler {
         String[] tokens = path.split("\\.");
         for (int i = 0; i < tokens.length; i++) {
             if (i == tokens.length - 1) {
-                operations.add(new OperationPush(new ValueReference(tokens[i])));
+                operations.add(new OperationPush(new ValueReference(tokens[i].hashCode())));
             } else {
-                operations.add(new OperationGetAndPush(tokens[i]));
+                operations.add(new OperationGetAndPush(tokens[i].hashCode()));
             }
         }
     }

@@ -10,7 +10,7 @@ import ru.iammaxim.GaledwellLang.Values.ValueVoid;
  */
 public class FunctionPrint extends ValueFunction {
     public FunctionPrint() {
-        super("print", "values");
+        super("print".hashCode(), "values".hashCode());
     }
 
     @Override

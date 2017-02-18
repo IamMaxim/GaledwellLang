@@ -7,10 +7,15 @@ import ru.iammaxim.GaledwellLang.Runtime;
  * Created by maxim on 2/12/17 at 1:13 PM.
  */
 public class ValueReference extends Value {
-    public String name;
+    public int id;
+    public String path;
 
-    public ValueReference(String name) {
-        this.name = name;
+    public ValueReference(int id) {
+        this.id = id;
+    }
+
+    public ValueReference(String path) {
+        this.path = path;
     }
 
     @Override
@@ -40,11 +45,11 @@ public class ValueReference extends Value {
 
     @Override
     public String toString() {
-        return "reference: " + name;
+        return "reference: " + id;
     }
 
     @Override
     public String toString(Runtime runtime, int indent) {
-        return "reference: " + name;
+        return "reference: " + id;
     }
 }

@@ -16,16 +16,11 @@ public class Stack {
     }
 
     public void push(Value o) {
-//        System.out.println("pushing " + o.toString(null, 0).replace("\n", " "));
         stack[++cursor] = o;
     }
 
     public Value pop() {
-//        System.out.println("popping");
-        Value v = stack[cursor];
-        stack[cursor] = null;
-        cursor--;
-        return v;
+        return stack[cursor--];
     }
 
     public Value get() {

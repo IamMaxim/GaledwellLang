@@ -8,21 +8,21 @@ import ru.iammaxim.GaledwellLang.Values.ValueObject;
  * Created by maxim on 2/18/17 at 4:19 PM.
  */
 public class OperationGetAndPush extends Operation {
-    public String name;
+    public int id;
 
-    public OperationGetAndPush(String name) {
-        this.name = name;
+    public OperationGetAndPush(int id) {
+        this.id = id;
     }
 
     @Override
     public Value run(Runtime runtime) throws InvalidOperationException {
         ValueObject obj = (ValueObject) runtime.stack.pop();
-        runtime.stack.push(obj.getField(name));
+        runtime.stack.push(obj.getField(id));
         return null;
     }
 
     @Override
     public String toString(Runtime runtime, int indent) {
-        return "getAndPush: " + name;
+        return "getAndPush: " + id;
     }
 }

@@ -1,6 +1,6 @@
 package ru.iammaxim.GaledwellLang.Parser;
 
-import ru.iammaxim.GaledwellLang.Main;
+import ru.iammaxim.GaledwellLang.GaledwellLang;
 import ru.iammaxim.GaledwellLang.Parser.Expression.*;
 import ru.iammaxim.GaledwellLang.Values.Value;
 
@@ -22,7 +22,7 @@ public class FunctionParser {
         tokener.trimParentheses();
 
         try {
-            Main.fos3.write(("parsing " + tokener + "\n").getBytes());
+            GaledwellLang.fos3.write(("parsing " + tokener + "\n").getBytes());
 
             //check if this is value
             if (tokener.size() == 1) {
@@ -130,25 +130,25 @@ public class FunctionParser {
 
         while (tokener.left() > 0) {
             Token functionName;
-            String[] args;
+            int[] args;
             ArrayList<Expression> exps = new ArrayList<>();
 
-            //read function name
+            //read function path
             if ((functionName = eat()).type != TokenType.IDENTIFIER)
-                throw new InvalidTokenException("Excepted identifier while parsing function name");
+                throw new InvalidTokenException("Excepted identifier while parsing function path");
 
             //read function args
             if (!eat().equals(new Token("(")))
                 throw new InvalidTokenException("Excepted (");
             Tokener argsTokener = tokener.readTo(new Token(")"));
             ArrayList<Tokener> argsTokeners = argsTokener.split(new Token(","));
-            args = new String[argsTokeners.size()];
+            args = new int[argsTokeners.size()];
             for (int i = 0; i < argsTokeners.size(); i++) {
                 Tokener argTokener1 = argsTokeners.get(i);
                 if (argTokener1.size() > 1)
                     throw new InvalidTokenException("Excepted 1 identifier, got " + argTokener1.size() + " while parsing argument");
                 if (argTokener1.size() > 0)
-                    args[i] = argTokener1.tokens.get(0).token;
+                    args[i] = argTokener1.tokens.get(0).token.hashCode();
             }
 
             //read function body
@@ -169,7 +169,7 @@ public class FunctionParser {
             }
 
             //build function
-            functions.add(new ParsedFunction(functionName.token, args, exps));
+            functions.add(new ParsedFunction(functionName.token.hashCode(), args, exps));
         }
 
         return functions;

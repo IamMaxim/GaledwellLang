@@ -8,7 +8,7 @@ import java.util.HashMap;
  * Created by maxim on 1/22/17 at 3:38 PM.
  */
 public class VariableStorage extends ValueObject {
-    private HashMap<String, Value> globalVariables = new HashMap<>();
+    private HashMap<Integer, Value> globalVariables = new HashMap<>();
 
     public VariableStorage(String value) {
         super(value);
@@ -16,47 +16,20 @@ public class VariableStorage extends ValueObject {
 
     public VariableStorage() {}
 
-    public void setGlobalVar(String name, Value value) {
-        globalVariables.put(name, value);
+    public void setGlobalVar(int id, Value value) {
+        globalVariables.put(id, value);
     }
 
-    public Value getGlobalVar(String name) {
-        return globalVariables.get(name);
+    public Value getGlobalVar(int id) {
+        return globalVariables.get(id);
     }
-
-/*
-    public void setVar(String name, Value value) {
-        if (name.contains(".")) {
-            int divisionIndex = name.indexOf(".");
-            String fieldName = name.substring(0, divisionIndex);
-            String innerFieldName = name.substring(divisionIndex + 1, name.length());
-            ((ValueObject) variables.get(fieldName)).setField(innerFieldName, value);
-        } else {
-            variables.put(name, value);
-        }
-    }
-
-    public Value getVar(String name) {
-        Value value;
-        if (name.contains(".")) {
-            int divisionIndex = name.indexOf(".");
-            String fieldName = name.substring(0, divisionIndex);
-            String innerFieldName = name.substring(divisionIndex + 1, name.length());
-            value = ((ValueObject) variables.get(fieldName)).getField(innerFieldName);
-        } else {
-            value = variables.get(name);
-        }
-        if (value == null) value = globalVariables.get(name);
-        return value;
-    }
-*/
 
     @Override
     public String toString(Runtime runtime, int indent) {
         /*StringJoiner sj1 = new StringJoiner(",\n" + Utils.indent(indent + 2));
         StringJoiner sj2 = new StringJoiner(",\n" + Utils.indent(indent + 2));
-        fields.forEach((name, value) -> sj1.add("\"" + name + "\"" + ": " + value.toString(runtime, indent + 2)));
-        globalVariables.forEach((name, value) -> sj2.add("\"" + name + "\"" + ": " + value.toString(runtime, indent + 2)));
+        fields.forEach((path, value) -> sj1.add("\"" + path + "\"" + ": " + value.toString(runtime, indent + 2)));
+        globalVariables.forEach((path, value) -> sj2.add("\"" + path + "\"" + ": " + value.toString(runtime, indent + 2)));
         return
                 Utils.indent(indent) + "\"VariableStorage\": {\n" +
                 Utils.indent(indent + 1) + "\"variables\": {" + "\n" +

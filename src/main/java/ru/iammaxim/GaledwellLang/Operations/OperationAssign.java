@@ -11,7 +11,7 @@ import ru.iammaxim.GaledwellLang.Values.ValueReference;
 public class OperationAssign extends Operation {
     @Override
     public Value run(Runtime runtime) {
-        String name = ((ValueReference) runtime.stack.pop()).name;
+        int name = ((ValueReference) runtime.stack.pop()).id;
         ValueObject parent = (ValueObject) runtime.stack.pop();
         Value value = runtime.stack.pop();
         parent.setField(name, value);

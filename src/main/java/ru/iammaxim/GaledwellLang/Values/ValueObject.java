@@ -9,7 +9,7 @@ import java.util.HashMap;
  * Created by maxim on 2/12/17 at 10:18 AM.
  */
 public class ValueObject extends Value {
-    protected HashMap<String, Value> fields = new HashMap<>();
+    protected HashMap<Integer, Value> fields = new HashMap<>();
 
     public ValueObject(String value) {
     }
@@ -46,39 +46,31 @@ public class ValueObject extends Value {
         throw new InvalidOperationException("Not implemented");
     }
 
-    public void setField(String name, Value value) {
-        /*if (name.contains(".")) {
-            int divisionIndex = name.indexOf(".");
-            String fieldName = name.substring(0, divisionIndex);
-            String innerFieldName = name.substring(divisionIndex + 1, name.length());
+    public void setField(int id, Value value) {
+        /*if (path.contains(".")) {
+            int divisionIndex = path.indexOf(".");
+            String fieldName = path.substring(0, divisionIndex);
+            String innerFieldName = path.substring(divisionIndex + 1, path.length());
             ((ValueObject) fields.get(fieldName)).setField(innerFieldName, value);
         } else {
-            fields.put(name, value);
+            fields.put(path, value);
         }*/
 
-        fields.put(name, value);
+        fields.put(id, value);
     }
 
-    public Value getField(String name) {
-        /*if (name.contains(".")) {
-            int divisionIndex = name.indexOf(".");
-            String fieldName = name.substring(0, divisionIndex);
-            String innerFieldName = name.substring(divisionIndex + 1, name.length());
-            return ((ValueObject) fields.get(fieldName)).getField(innerFieldName);
-        } else {
-            return fields.get(name);
-        }*/
-        return fields.get(name);
+    public Value getField(int id) {
+        return fields.get(id);
     }
 
-    public void removeField(String name) {
-        fields.remove(name);
+    public void removeField(int id) {
+        fields.remove(id);
     }
 
     @Override
     public String toString(Runtime runtime, int indent) {
 /*        StringJoiner sj = new StringJoiner(",\n" + Utils.indent(indent + 3));
-        fields.forEach((name, value) -> sj.add("\"" + name + "\"" + ": " + value.toString(runtime, indent + 3)));
+        fields.forEach((path, value) -> sj.add("\"" + path + "\"" + ": " + value.toString(runtime, indent + 3)));
         return "\"object\":\n" +
                 Utils.indent(indent + 1) + "{\n" +
                 Utils.indent(indent + 2) + sj.toString() + "\n" +
