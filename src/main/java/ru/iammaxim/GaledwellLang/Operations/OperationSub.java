@@ -9,8 +9,8 @@ import ru.iammaxim.GaledwellLang.Values.Value;
 public class OperationSub extends Operation {
     @Override
     public Value run(Runtime runtime) throws InvalidOperationException {
-        Value second = runtime.stack.pop();
         Value first = runtime.stack.pop();
+        Value second = runtime.stack.pop();
         Value result = first.operatorMinus(second);
         runtime.stack.push(result);
 

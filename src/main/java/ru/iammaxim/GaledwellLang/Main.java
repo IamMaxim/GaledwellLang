@@ -71,12 +71,12 @@ public class Main {
                 }
             });
 
-/*            long start = System.currentTimeMillis();
-            for (int i = 0; i < 100000000; i++)*/
+            long start = System.currentTimeMillis();
+            for (int i = 0; i < 100000000; i++)
                 ((ValueFunction)runtime.variableStorage.getField("main")).call(runtime);
-//            System.out.println("elapsed time: " + (float)(System.currentTimeMillis() - start)/1000 + "sec");
+            System.out.println("elapsed time: " + (float)(System.currentTimeMillis() - start)/1000 + "sec");
 
-            System.out.println(runtime.variableStorage.toString(runtime, 0));
+//            System.out.println(runtime.variableStorage.toString(runtime, 0));
 
         } catch (FileNotFoundException | InvalidTokenException | InvalidOperationException e) {
             e.printStackTrace();

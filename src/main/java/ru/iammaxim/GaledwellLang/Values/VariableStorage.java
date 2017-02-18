@@ -1,10 +1,8 @@
 package ru.iammaxim.GaledwellLang.Values;
 
 import ru.iammaxim.GaledwellLang.Runtime;
-import ru.iammaxim.GaledwellLang.Utils;
 
 import java.util.HashMap;
-import java.util.StringJoiner;
 
 /**
  * Created by maxim on 1/22/17 at 3:38 PM.
@@ -55,7 +53,7 @@ public class VariableStorage extends ValueObject {
 
     @Override
     public String toString(Runtime runtime, int indent) {
-        StringJoiner sj1 = new StringJoiner(",\n" + Utils.indent(indent + 2));
+        /*StringJoiner sj1 = new StringJoiner(",\n" + Utils.indent(indent + 2));
         StringJoiner sj2 = new StringJoiner(",\n" + Utils.indent(indent + 2));
         fields.forEach((name, value) -> sj1.add("\"" + name + "\"" + ": " + value.toString(runtime, indent + 2)));
         globalVariables.forEach((name, value) -> sj2.add("\"" + name + "\"" + ": " + value.toString(runtime, indent + 2)));
@@ -67,7 +65,8 @@ public class VariableStorage extends ValueObject {
                 Utils.indent(indent + 1) + "\"globalVariables\": {\n" +
                 Utils.indent(indent + 2) + sj2.toString() + "\n" +
                 Utils.indent(indent + 1) + "}\n" +
-                Utils.indent(indent) + "}";
-//        return "variableStorage";
+                Utils.indent(indent) + "}";*/
+
+        return "variableStorage";
     }
 }

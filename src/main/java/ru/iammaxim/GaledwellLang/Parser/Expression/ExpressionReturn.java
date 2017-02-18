@@ -9,4 +9,9 @@ public class ExpressionReturn extends Expression {
     public ExpressionReturn(Expression returnExp) {
         this.returnExp = returnExp;
     }
+
+    @Override
+    public String toString() {
+        return "return";
+    }
 }

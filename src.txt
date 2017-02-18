@@ -5,19 +5,19 @@ main() {
 
     testClass = class;
 
-    testClass.string = "a string";
+    testClass.string = "a string" + " a second part";
     testClass.int = 127;
     testClass.innerClass = class;
     testClass.innerClass.float = 0.1f;
 
     func(testClass.string,
      testClass.int,
-      testClass.innerClass.float);
+     testClass.innerClass.float);
 
-    func(123, 123.456f, "123456789");
+    j = func(123, 123.456f, "123456789");
 }
 
 func(s, i, f) {
-    print(s, i, f);
+//    print(s, i, f);
     return 1;
 }

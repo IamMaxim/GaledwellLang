@@ -29,64 +29,77 @@ public class Compiler {
     private void _compileFunction() {
         for (int i = 0; i < exps.size(); i++) {
             Expression exp = exps.get(i);
+            compileExpression(exp, 0);
+        }
+    }
 
+    private void compileExpression(Expression exp, int depth) {
+        try {
+            Main.fos3.write(("compiling: " + exp.toString() + "\n").getBytes());
+
+            //check if this is function call
             if (exp instanceof ExpressionFunctionCall) {
+                Main.fos3.write(("compiling: function call\n").getBytes());
+
                 ExpressionFunctionCall call = (ExpressionFunctionCall) exp;
 
                 for (int j = call.args.size() - 1; j >= 0; j--) {
                     Expression arg = call.args.get(j);
-                    compileExpression(arg);
+                    compileExpression(arg, 0);
                 }
 
                 compilePathToVar(call.functionName);
                 operations.add(new OperationCall(call.args.size()));
+                if (depth == 0)
+                    operations.add(new OperationPop()); //pop return value of function if it won't be used
             } else if (exp instanceof ExpressionReturn) {
-                compileExpression(((ExpressionReturn) exp).returnExp);
-//                operations.add(new OperationReturn());
-            } else {
-                compileExpression(exp);
-            }
-        }
-    }
+                Main.fos3.write(("compiling: return\n").getBytes());
 
-    private void compileExpression(Expression exp) {
-        try {
-            Main.fos3.write(("compiling: " + exp.toString() + "\n").getBytes());
+                compileExpression(((ExpressionReturn) exp).returnExp, depth + 1);
+                operations.add(new OperationReturn());
+            } else if (exp instanceof ExpressionValue) {
+                Main.fos3.write(("compiling: value\n").getBytes());
+
+                ExpressionValue val = (ExpressionValue) exp;
+                if (val.value instanceof ValueReference) {
+                    compilePathToVar(((ValueReference) val.value).name);
+                } else
+                    operations.add(new OperationPush(val.value));
+            } else if (exp instanceof ExpressionTree) {
+                Main.fos3.write(("compiling: tree\n").getBytes());
+
+                ExpressionTree tree = ((ExpressionTree) exp);
+
+                if (tree.operator.type == TokenType.OPERATOR) {
+                    compileExpression(tree.right, depth + 1);
+                    compileExpression(tree.left, depth + 1);
+
+                    switch (tree.operator.token) {
+                        case "+":
+                            operations.add(new OperationAdd());
+                            break;
+                        case "-":
+                            operations.add(new OperationSub());
+                            break;
+                        case "*":
+                            operations.add(new OperationMul());
+                            break;
+                        case "/":
+                            operations.add(new OperationDiv());
+                            break;
+                        case "=":
+                            operations.add(new OperationAssign());
+                            if (depth == 0)
+                                operations.add(new OperationPop()); //pop value if it won't be used
+                            break;
+                    }
+
+                }
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        if (exp instanceof ExpressionValue) {
-            ExpressionValue val = (ExpressionValue) exp;
-            if (val.value instanceof ValueReference) {
-                compilePathToVar(((ValueReference) val.value).name);
-            } else
-                operations.add(new OperationPush(val.value));
-        }
-        else if (exp instanceof ExpressionTree) {
-            ExpressionTree tree = ((ExpressionTree) exp);
-
-            if (tree.operator.type == TokenType.OPERATOR) {
-                compileExpression(tree.right);
-                compileExpression(tree.left);
-
-                switch (tree.operator.token) {
-                    case "+":
-                        operations.add(new OperationAdd());
-                        break;
-                    case "-":
-                        operations.add(new OperationSub());
-                        break;
-                    case "*":
-                        operations.add(new OperationMul());
-                        break;
-                    case "/":
-                        operations.add(new OperationDiv());
-                        break;
-                    case "=":
-                        operations.add(new OperationAssign());
-                }
-
-            }
         }
     }
 

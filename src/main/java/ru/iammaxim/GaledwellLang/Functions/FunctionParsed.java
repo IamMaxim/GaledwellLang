@@ -29,8 +29,11 @@ public class FunctionParsed extends ValueFunction {
         //iterate over all operators
         runtime.currentCursorPos = 0;
         int size = operations.size();
+        runtime.currentFunctionLength = size;
         while (runtime.currentCursorPos < size) {
             Operation op = operations.get(runtime.currentCursorPos);
+//            System.out.println("op: " + op.toString(runtime, 0));
+//            System.out.println("stack: " + runtime.stack);
             op.run(runtime);
             runtime.currentCursorPos++;
         }

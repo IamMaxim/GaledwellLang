@@ -1,8 +1,10 @@
 package ru.iammaxim.GaledwellLang.Parser;
 
+import ru.iammaxim.GaledwellLang.Main;
 import ru.iammaxim.GaledwellLang.Parser.Expression.*;
 import ru.iammaxim.GaledwellLang.Values.Value;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -14,6 +16,109 @@ public class FunctionParser {
 
     public FunctionParser(ArrayList<Token> tokens) {
         tokener = new Tokener(tokens);
+    }
+
+    public static Expression parseExpression(Tokener tokener) throws InvalidTokenException {
+        tokener.trimParentheses();
+
+        try {
+            Main.fos3.write(("parsing " + tokener + "\n").getBytes());
+
+            //check if this is value
+            if (tokener.size() == 1) {
+                Value val = Value.get(tokener.tokens.get(0).token);
+                if (val != null)
+                    return new ExpressionValue(val);
+            }
+
+            //check if this is return
+            if (tokener.size() >= 2) {
+                if (tokener.tokens.get(0).token.equals("return")) {
+                    return new ExpressionReturn(parseExpression(tokener.subtokener(1, tokener.size())));
+                }
+            }
+
+            int level = 0;
+            Token t, highest = null;
+            int highestPriorityIndex = -1;
+            for (int i = 0; tokener.left() > 0; i++) {
+                t = tokener.eat();
+                if (t.token.equals("(")) {
+                    //check if this is function call
+                    if (highest == null && i > 0 && tokener.tokens.get(i - 1).type == TokenType.IDENTIFIER)
+                        try {
+                            int index = tokener.index;
+                            Tokener argsTokener = tokener.readTo(new Token(")"));
+                            ArrayList<Tokener> args = argsTokener.split(new Token(","));
+                            tokener.index = index;
+                            return new ExpressionFunctionCall(tokener.tokens.get(i - 1), args);
+                        } catch (InvalidTokenException e) {
+                            e.printStackTrace();
+                        }
+
+                    level++;
+                } else if (t.token.equals(")")) {
+                    level--;
+                }
+                if (level == 0) {
+                    if (t.type == TokenType.OPERATOR) {
+                        if (highest == null) {
+                            highest = t;
+                            highestPriorityIndex = i;
+                        } else {
+                            if (isOrderHigher(highest, t)) {
+                                highest = t;
+                                highestPriorityIndex = i;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (highest == null)
+                return new ExpressionTree(tokener.tokens.get(0));
+
+            return new ExpressionTree(highest,
+                    parseExpression(tokener.subtokener(0, highestPriorityIndex)),
+                    parseExpression(tokener.subtokener(highestPriorityIndex + 1, tokener.size())));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param first  first token
+     * @param second second token
+     * @return true if second's order is higher than first's
+     * @throws InvalidTokenException if one of operators unknown
+     */
+    private static boolean isOrderHigher(Token first, Token second) throws InvalidTokenException {
+        return getOrder(first) < getOrder(second);
+    }
+
+    /**
+     * @param t token to check
+     * @return operator's order
+     * @throws InvalidTokenException if operator unknown
+     */
+    private static int getOrder(Token t) throws InvalidTokenException {
+        int level = 0;
+        if (t.token.equals("*") || t.token.equals("/"))
+            level = 1;
+        else if (t.token.equals("+") || t.token.equals("-"))
+            level = 2;
+        else if (t.token.equals("++") || t.token.equals("--"))
+            level = 3;
+        else if (t.token.equals("=="))
+            level = 4;
+        else if (t.token.equals("="))
+            level = 5;
+        else throw new InvalidTokenException("Excepted operator, but got " + t.token);
+
+        return level;
     }
 
     private Token eat() {
@@ -68,101 +173,5 @@ public class FunctionParser {
         }
 
         return functions;
-    }
-
-    public static Expression parseExpression(Tokener tokener) throws InvalidTokenException {
-        tokener.trimParentheses();
-
-        //check if this is value
-        if (tokener.size() == 1) {
-            Value val = Value.get(tokener.tokens.get(0).token);
-            if (val != null)
-                return new ExpressionValue(val);
-        }
-
-        //check if this is return
-        if (tokener.size() >= 2) {
-            if (tokener.tokens.get(0).token.equals("return")) {
-                return new ExpressionReturn(parseExpression(tokener.subtokener(1, tokener.size())));
-            }
-        }
-
-        int level = 0;
-        Token t, highest = null;
-        int highestPriorityIndex = -1;
-        for (int i = 0; tokener.left() > 0; i++) {
-            t = tokener.eat();
-            if (t.token.equals("(")) {
-                //check if this is function call
-                if (i > 0 && tokener.tokens.get(i - 1).type == TokenType.IDENTIFIER)
-                    try {
-                        int index = tokener.index;
-                        Tokener argsTokener = tokener.readTo(new Token(")"));
-                        ArrayList<Tokener> args = argsTokener.split(new Token(","));
-                        tokener.index = index;
-                        return new ExpressionFunctionCall(tokener.tokens.get(i - 1), args);
-                    } catch (InvalidTokenException e) {
-                        e.printStackTrace();
-                    }
-
-                level++;
-            } else if (t.token.equals(")")) {
-                level--;
-            }
-            if (level == 0) {
-                if (t.type == TokenType.OPERATOR) {
-                    if (highest == null) {
-                        highest = t;
-                        highestPriorityIndex = i;
-                    } else {
-                        if (isOrderHigher(highest, t)) {
-                            highest = t;
-                            highestPriorityIndex = i;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (highest == null)
-            return new ExpressionTree(tokener.tokens.get(0));
-
-        return new ExpressionTree(highest,
-                parseExpression(tokener.subtokener(0, highestPriorityIndex)),
-                parseExpression(tokener.subtokener(highestPriorityIndex + 1, tokener.size())));
-    }
-
-
-    /**
-     * @param first  first token
-     * @param second second token
-     * @return true if second's order is higher than first's
-     * @throws InvalidTokenException if one of operators unknown
-     */
-    private static boolean isOrderHigher(Token first, Token second) throws InvalidTokenException {
-        return getOrder(first) < getOrder(second);
-    }
-
-
-    /**
-     * @param t token to check
-     * @return operator's order
-     * @throws InvalidTokenException if operator unknown
-     */
-    private static int getOrder(Token t) throws InvalidTokenException {
-        int level = 0;
-        if (t.token.equals("*") || t.token.equals("/"))
-            level = 1;
-        else if (t.token.equals("+") || t.token.equals("-"))
-            level = 2;
-        else if (t.token.equals("++") || t.token.equals("--"))
-            level = 3;
-        else if (t.token.equals("=="))
-            level = 4;
-        else if (t.token.equals("="))
-            level = 5;
-        else throw new InvalidTokenException("Excepted operator, but got " + t.token);
-
-        return level;
     }
 }

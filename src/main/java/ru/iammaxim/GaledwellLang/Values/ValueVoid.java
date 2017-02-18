@@ -4,13 +4,12 @@ import ru.iammaxim.GaledwellLang.Operations.InvalidOperationException;
 import ru.iammaxim.GaledwellLang.Runtime;
 
 /**
- * Created by maxim on 2/12/17 at 1:13 PM.
+ * Created by maxim on 2/18/17 at 10:30 PM.
  */
-public class ValueReference extends Value {
-    public String name;
-
-    public ValueReference(String name) {
-        this.name = name;
+public class ValueVoid extends Value {
+    @Override
+    public String toString(Runtime runtime, int indent) {
+        return "void";
     }
 
     @Override
@@ -34,17 +33,12 @@ public class ValueReference extends Value {
     }
 
     @Override
+    public String toString() {
+        return "void";
+    }
+
+    @Override
     public Value operatorEquals(Value right) throws InvalidOperationException {
         throw new InvalidOperationException("Not implemented");
-    }
-
-    @Override
-    public String toString() {
-        return "reference: " + name;
-    }
-
-    @Override
-    public String toString(Runtime runtime, int indent) {
-        return "reference: " + name;
     }
 }

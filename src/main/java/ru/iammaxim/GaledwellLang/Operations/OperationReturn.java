@@ -12,7 +12,7 @@ public class OperationReturn extends Operation {
 
     @Override
     public Value run(Runtime runtime) {
-        runtime.returnValueTmp = runtime.stack.pop();
+//        runtime.returnValueTmp = runtime.stack.pop();
         runtime.goToFunctionEnd();
         return null;
     }

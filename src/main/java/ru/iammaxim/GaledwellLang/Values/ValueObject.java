@@ -2,10 +2,8 @@ package ru.iammaxim.GaledwellLang.Values;
 
 import ru.iammaxim.GaledwellLang.Operations.InvalidOperationException;
 import ru.iammaxim.GaledwellLang.Runtime;
-import ru.iammaxim.GaledwellLang.Utils;
 
 import java.util.HashMap;
-import java.util.StringJoiner;
 
 /**
  * Created by maxim on 2/12/17 at 10:18 AM.
@@ -79,13 +77,14 @@ public class ValueObject extends Value {
 
     @Override
     public String toString(Runtime runtime, int indent) {
-        StringJoiner sj = new StringJoiner(",\n" + Utils.indent(indent + 3));
+/*        StringJoiner sj = new StringJoiner(",\n" + Utils.indent(indent + 3));
         fields.forEach((name, value) -> sj.add("\"" + name + "\"" + ": " + value.toString(runtime, indent + 3)));
-        return "\"class\":\n" +
+        return "\"object\":\n" +
                 Utils.indent(indent + 1) + "{\n" +
                 Utils.indent(indent + 2) + sj.toString() + "\n" +
-                Utils.indent(indent + 1) + "}";
-//        return "object: " + fields.toString();
+                Utils.indent(indent + 1) + "}";*/
+
+        return "object";
     }
 
     public static boolean isValid(String value) {

@@ -16,7 +16,7 @@ public abstract class Value {
         else if (ValueFloat.isValid(value))
             return new ValueFloat(Float.parseFloat(value));
         else if (ValueString.isValid(value))
-            return new ValueString(value);
+            return new ValueString(value.substring(1, value.length() - 1)); //remove quotes
         else if (ValueObject.isValid(value))
             return new ValueObject();
         else return new ValueReference(value);
